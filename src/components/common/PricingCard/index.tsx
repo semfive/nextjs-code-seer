@@ -16,7 +16,7 @@ interface IPricingCard {
   ];
 }
 
-const PricingCard = ({ type, price, features }: IPricingCard) => {
+const PricingCard: React.FC<IPricingCard> = ({ type, price, features }) => {
   return (
     <div className={styles.wrapper}>
       <h2 className='font-semibold text-3xl text-primary_blue '>{type}</h2>

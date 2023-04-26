@@ -4,8 +4,10 @@ import background from '/public/welcome-background.png';
 import GithubIcon from '/public/github-icon.png';
 import { ButtonOutline } from '@/components';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const Login = () => {
+  const router = useRouter();
   return (
     <div className='relative h-full w-full flex justify-center items-center'>
       <Image
@@ -22,7 +24,10 @@ const Login = () => {
           alt='background'
           className='w-32 h-auto object-contain my-3'
         />
-        <ButtonOutline className='rounded-lg font-semibold mb-8'>
+        <ButtonOutline
+          className='rounded-lg font-semibold mb-8'
+          onClick={() => router.push('/organizations')}
+        >
           Login with Github
         </ButtonOutline>
         <div className='w-full border-t border-black pt-7 pb-4 text-center text-sm'>

@@ -1,0 +1,6 @@
+.selected {
+  @apply text-dark_blue;
+  &::after {
+    width: 100%;
+  }
+}
