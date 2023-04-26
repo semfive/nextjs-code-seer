@@ -1,5 +1,5 @@
+import { IIcon } from '@/interfaces';
 import React from 'react';
-import { IIcon } from '../../../interface';
 
 const BellFilledIcon = ({
   width,

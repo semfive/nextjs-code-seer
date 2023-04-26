@@ -1,5 +1,5 @@
 import React from 'react';
-import { IIcon } from '../../../interface';
+import { IIcon } from '@/interfaces';
 
 const PlusIcon = ({
   width,
