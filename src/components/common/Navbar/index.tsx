@@ -3,12 +3,18 @@ import styles from './Navbar.module.scss';
 import Image from 'next/image';
 import CodeSeerLogo from '/public/codeseer-logo.png';
 import { BellFilledIcon, PlusIcon, SearchIcon } from '@/components/icons';
+import { useRouter } from 'next/router';
 
 const Navbar: React.FC = () => {
+  const router = useRouter();
+
   return (
     <header className={styles.wrapper}>
       <div className={styles.left}>
-        <button className='flex items-center gap-4'>
+        <button
+          className='flex items-center gap-4'
+          onClick={() => router.push('/')}
+        >
           <Image src={CodeSeerLogo} alt='CodeSeer Logo' />
           <h3 className='font-semibold text-2xl'>CodeSeer</h3>
         </button>

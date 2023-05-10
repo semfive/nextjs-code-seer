@@ -11,6 +11,12 @@ import CaretDown from './CaretDown/CaretDown';
 import SettingsIcon from './SettingsIcon/SettingsIcon';
 import CircleChevronLeft from './CircleChevronLeft/CircleChevronLeft';
 import CircleChevronRight from './CircleChevronRight/CircleChevronRight';
+import FolderIcon from './FolderIcon';
+import FileCodeIcon from './FileCodeIcon';
+import EyeClosedIcon from './EyeClosedIcon';
+import EyeFilledIcon from './EyeFilledIcon';
+import ChevronRight from './ChevronRight';
+import ClipboardText from './ClipboardText';
 
 export {
   BellFilledIcon,
@@ -26,4 +32,10 @@ export {
   SettingsIcon,
   CircleChevronLeft,
   CircleChevronRight,
+  FolderIcon,
+  FileCodeIcon,
+  EyeClosedIcon,
+  EyeFilledIcon,
+  ChevronRight,
+  ClipboardText,
 };
