@@ -17,6 +17,8 @@ import EyeClosedIcon from './EyeClosedIcon';
 import EyeFilledIcon from './EyeFilledIcon';
 import ChevronRight from './ChevronRight';
 import ClipboardText from './ClipboardText';
+import TagIcon from './TagIcon';
+import CloseIcon from './CloseIcon';
 
 export {
   BellFilledIcon,
@@ -38,4 +40,6 @@ export {
   EyeFilledIcon,
   ChevronRight,
   ClipboardText,
+  TagIcon,
+  CloseIcon,
 };

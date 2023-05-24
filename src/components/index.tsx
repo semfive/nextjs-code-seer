@@ -9,6 +9,12 @@ import CommitChanges from './common/CommitChanges';
 import CustomNode from './common/CustomNode';
 import FloatingConnectionLine from './common/FloatingConnectionLine';
 import FloatingEdge from './common/FloatingEdge';
+import DependencyMapSidebar from './common/DependecyMapSidebar';
+import ActionBar from './common/ActionBar';
+import FloatingActionBar from './common/FloatingActionBar';
+import CreateOrgForm from './common/CreateOrgForm';
+import CreateDomainForm from './common/CreateDomainForm';
+import CreateTeamForm from './common/CreateTeamForm';
 
 export {
   ButtonOutline,
@@ -22,4 +28,10 @@ export {
   CustomNode,
   FloatingEdge,
   FloatingConnectionLine,
+  DependencyMapSidebar,
+  ActionBar,
+  FloatingActionBar,
+  CreateOrgForm,
+  CreateDomainForm,
+  CreateTeamForm,
 };
