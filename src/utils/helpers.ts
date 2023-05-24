@@ -111,7 +111,7 @@ export function getNodeSize(name: string) {
   document.body.appendChild(dummy);
 
   // Get the width of the dummy element and set it as the width of the div
-  const dummyWidth = dummy.offsetWidth;
+  const dummyWidth = dummy.offsetWidth + 44;
   const dummyHeight = dummy.offsetHeight;
 
   // Remove the dummy element
