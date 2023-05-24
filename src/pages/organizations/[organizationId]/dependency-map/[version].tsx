@@ -1,20 +1,4 @@
-import {
-  CustomNode,
-  FloatingConnectionLine,
-  FloatingEdge,
-  Layout,
-} from '@/components';
-import DependencyMapSidebar from '@/components/common/DependecyMapSidebar';
-import {
-  ChevronRight,
-  CircleChevronRight,
-  ClipboardText,
-} from '@/components/icons';
-import {
-  initialEdges,
-  initialNodes,
-} from '@/utils/dependency-map/initial_setup';
-import data from '@/utils/dependency-map/output.json';
+/* eslint-disable no-loop-func */
 import React, { useCallback } from 'react';
 import {
   addEdge,
@@ -28,7 +12,29 @@ import {
   useEdgesState,
   useNodesState,
 } from 'reactflow';
-import styles from './[version].module.scss';
+
+import {
+  ActionBar,
+  FloatingActionBar,
+  CustomNode,
+  FloatingConnectionLine,
+  FloatingEdge,
+} from '@/components';
+// import { ChevronRight, ClipboardText }
+
+// import ActionBar from "./ActionBar/ActionBar";
+import data from '@/utils/dependency-map/output.json';
+
+import './[version].module.scss';
+import {
+  ChevronRight,
+  CircleChevronRight,
+  ClipboardText,
+} from '@/components/icons';
+import {
+  initialEdges,
+  initialNodes,
+} from '@/utils/dependency-map/initial_setup';
 
 interface CollisionInfo {
   collided: boolean;
@@ -109,7 +115,65 @@ const getFourCornPos = (node: Node) => {
   return nodeCorners;
 };
 
-const DependencyMap = () => {
+// eslint-disable-next-line no-unused-vars
+function detectRectanglesCollision(rectA: Node, rectB: Node): CollisionInfo {
+  // Get the positions of the corners of the two rectangles
+  const rectACorners: any = {
+    topLeft: { x: rectA.position.x, y: rectA.position.y },
+    topRight: { x: rectA.position.x + rectA.width!, y: rectA.position.y },
+    bottomLeft: { x: rectA.position.x, y: rectA.position.y + rectA.height! },
+    bottomRight: {
+      x: rectA.position.x + rectA.width!,
+      y: rectA.position.y + rectA.height!,
+    },
+  };
+  const rectBCorners: any = {
+    topLeft: { x: rectB.position.x, y: rectB.position.y },
+    topRight: { x: rectB.position.x + rectB.width!, y: rectB.position.y },
+    bottomLeft: { x: rectB.position.x, y: rectB.position.y + rectB.height! },
+    bottomRight: {
+      x: rectB.position.x + rectB.width!,
+      y: rectB.position.y + rectB.height!,
+    },
+  };
+
+  // Check if any of the corners of rectA are inside rectB
+  // eslint-disable-next-line no-restricted-syntax
+  for (const corner in rectACorners) {
+    if (
+      rectACorners[corner].x >= rectBCorners.topLeft.x &&
+      rectACorners[corner].x <= rectBCorners.topRight.x &&
+      rectACorners[corner].y >= rectBCorners.topLeft.y &&
+      rectACorners[corner].y <= rectBCorners.bottomLeft.y
+    ) {
+      // Calculate the overlap rectangle
+      const overlapX = Math.max(rectA.position.x, rectB.position.x);
+      const overlapY = Math.max(rectA.position.y, rectB.position.y);
+      const overlapWidth =
+        Math.min(
+          rectA.position.x + rectA.width!,
+          rectB.position.x + rectB.width!
+        ) - overlapX;
+      const overlapHeight =
+        Math.min(
+          rectA.position.y + rectA.height!,
+          rectB.position.y + rectB.height!
+        ) - overlapY;
+      // const overlapRect = { x: overlapX, y: overlapY, width: overlapWidth, height: overlapHeight };
+
+      // Move rectB out of the collision area by adding the width and height of the overlap rectangle to its position
+      return {
+        overlapX: overlapWidth,
+        overlapY: overlapHeight,
+        collided: true,
+      };
+    }
+  }
+
+  return { overlapX: 0, overlapY: 0, collided: false };
+}
+
+function Codebase() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(initialEdges);
 
@@ -420,7 +484,11 @@ const DependencyMap = () => {
     );
 
     sameLevelNodes.forEach((item) => {
-      if (item.position.y === node.position.y) {
+      if (
+        item.position.y === node.position.y ||
+        Math.abs(item.position.y - node.position.y) < item.width!! ||
+        Math.abs(item.position.y - node.position.y) < node.width!!
+      ) {
         if (item.position.x > rightMost.position.x) {
           rightMost = item;
         }
@@ -530,50 +598,43 @@ const DependencyMap = () => {
   };
 
   return (
-    <div className='flex-grow w-full h-full flex flex-col relative bg-white'>
-      <div className='px-7 py-6 flex justify-between bg-[#F7F8FA] border-b-2 border-[#E3E3E3] drop-shadow-md'>
-        <div className='flex gap-3 text-lg font-semibold'>
-          <span className='text-md_blue'>FPLMS</span>
-          <CircleChevronRight className='text-md_blue' />
-          <span className='text-primary_gray'>Battle Maids&apos; Domain</span>
-          <ChevronRight className='text-md_blue' />
-          <span className='text-primary_blue'>
-            Kennguyen2000/facebook-instagram-mobile
-          </span>
+    <div className='w-full h-screen flex overflow-hidden'>
+      <ActionBar />
+      <div className='flex-grow w-full h-full flex flex-col relative'>
+        <div className='px-7 py-6 flex justify-between bg-[#F7F8FA] border-b-2 border-[#E3E3E3] drop-shadow-md'>
+          <div className='flex gap-3 text-lg font-semibold'>
+            <span className='text-md_blue'>FPLMS</span>
+            <ChevronRight className='text-md_blue' />
+            <span className='text-primary_gray'>Battle Maids&apos; Domain</span>
+            <ChevronRight className='text-md_blue' />
+            <span className='text-primary_blue'>
+              Kennguyen2000/facebook-instagram-mobile
+            </span>
+          </div>
+          <ClipboardText className='text-dark_blue_2 cursor-pointer' />
         </div>
-        <ClipboardText className='text-dark_blue_2 cursor-pointer' />
-      </div>
-      <div className='flex grow w-full h-screen relative'>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          connectionLineComponent={FloatingConnectionLine}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          fitView
-          onNodeClick={onNodeClick}
-        >
-          <MiniMap />
-          <Controls />
-          <Background />
-        </ReactFlow>
+        <div className='flex grow w-full h-screen relative'>
+          <FloatingActionBar />
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            connectionLineComponent={FloatingConnectionLine}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            fitView
+            onNodeClick={onNodeClick}
+          >
+            <MiniMap />
+            <Controls />
+            <Background />
+          </ReactFlow>
+        </div>
       </div>
     </div>
   );
-};
+}
 
-export default DependencyMap;
-
-DependencyMap.getLayout = function getLayout(page: any) {
-  return (
-    <Layout>
-      <main className='flex-grow flex bg-[#f5f5f5]'>
-        <DependencyMapSidebar />
-        {page}
-      </main>
-    </Layout>
-  );
-};
+export default Codebase;

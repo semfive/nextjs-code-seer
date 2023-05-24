@@ -4,11 +4,27 @@ import React from 'react';
 import MapVersion from '/public/map-version.png';
 import Image from 'next/image';
 import Sidebar from '@/components/common/Sidebar';
+import useSWR from 'swr';
+import {
+  organizationEndpoint,
+  retrieveAnOrganization,
+} from '@/services/organization.service';
+import { retrieveTeams, teamEndpoint } from '@/services/team.service';
 
 const OrganizationDetail = () => {
   const router = useRouter();
 
   const { organizationId } = router.query;
+  const {
+    data: organization,
+    error: orgErr,
+    isLoading: isOrgLoading,
+  } = useSWR(
+    organizationId ? `${organizationEndpoint}/${organizationId}` : null,
+    retrieveAnOrganization
+  );
+
+  if (isOrgLoading) return <h1>Loading</h1>;
 
   return (
     <>
@@ -28,7 +44,7 @@ const OrganizationDetail = () => {
                   )
                 }
               >
-                <Image src={MapVersion} alt='Dependency Map' />
+                <Image src={MapVersion} alt='Dependency Map' priority={true} />
               </li>
             ))}
           </ul>
