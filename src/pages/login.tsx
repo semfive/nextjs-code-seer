@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 
 const Login = () => {
   const router = useRouter();
+
   return (
     <div className='relative h-full w-full flex justify-center items-center'>
       <Image
@@ -24,12 +25,12 @@ const Login = () => {
           alt='background'
           className='w-32 h-auto object-contain my-3'
         />
-        <ButtonOutline
-          className='rounded-lg font-semibold mb-8'
-          onClick={() => router.push('/organizations')}
-        >
-          Login with Github
-        </ButtonOutline>
+        <Link href={process.env.NEXT_PUBLIC_LOGIN_GITHUB as string}>
+          <ButtonOutline className='rounded-lg font-semibold mb-8'>
+            Login with Github
+          </ButtonOutline>
+        </Link>
+
         <div className='w-full border-t border-black pt-7 pb-4 text-center text-sm'>
           <p>Not yet? Login with a different account</p>
           <p>
