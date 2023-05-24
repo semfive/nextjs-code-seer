@@ -27,7 +27,7 @@ const CreateDomainForm = ({
   const [value, setValue] = useState('');
 
   const token = localStorage.getItem('token');
-  const user = jwt_decode(token as string);
+  const user: any = jwt_decode(token as string);
 
   const openLabelDropdown = () => {
     if (labelDropdown.current!!.classList.contains('invisible')) {
@@ -57,14 +57,17 @@ const CreateDomainForm = ({
     try {
       await mutate(
         domainEndpoint,
-        createNewDomain({
-          teamId: selectedTeam?.teamId as string,
-          payload: {
-            name: domainName.value,
-            directory: domainDirectory.value,
-            repository: domainRepository.value,
-          },
-        }).data,
+        async () => {
+          const data = createNewDomain({
+            teamId: selectedTeam?.teamId as string,
+            payload: {
+              name: domainName.value,
+              directory: domainDirectory.value,
+              repository: domainRepository.value,
+            },
+          });
+          return data;
+        },
         {
           optimisticData: [
             ...domains,
