@@ -1,7 +1,12 @@
-import { Layout, OrganizationCard } from '@/components';
+import { CreateOrgForm, Layout, OrganizationCard } from '@/components';
 import { Organization } from '@/interfaces';
 import React, { useState } from 'react';
 import styles from './organizations.module.scss';
+import useSWR from 'swr';
+import {
+  retrieveOrganizations,
+  organizationEndpoint,
+} from '@/services/organization.service';
 
 const mockData = new Array<Organization>(4).fill({
   organizationName: 'FPLMS',
@@ -20,9 +25,19 @@ const organizationTypes = [
 
 const OrganizationList = () => {
   const [selectedType, setSelectedType] = useState(organizationTypes[0]);
+  const [isShown, setIsShown] = useState(false);
+  const { data, error, isLoading } = useSWR(
+    organizationEndpoint,
+    retrieveOrganizations
+  );
+
+  console.log(data);
+
+  if (isLoading) return <h1 className='text-2xl font-bold'>Loading...</h1>;
 
   return (
     <main className='h-full px-10'>
+      {isShown && <CreateOrgForm isShown={isShown} setIsShown={setIsShown} />}
       <section className='mb-8'>
         <h1 className='text-4xl text-dark_blue font-semibold mt-14 mb-8'>
           Your Organization
@@ -31,15 +46,24 @@ const OrganizationList = () => {
           <h3 className='text-2xl font-semibold text-dark_blue'>
             Recent Organizations
           </h3>
-          <a className='underline text-primary_blue' href='#' type='button'>
+          <a
+            className='underline text-primary_blue'
+            href='#'
+            type='button'
+            onClick={() => setIsShown(true)}
+          >
             Create new
           </a>
         </div>
 
         <div className='flex md:flex-wrap flex-col md:flex-row gap-8'>
-          {mockData.map((item, index) => (
-            <OrganizationCard key={index} organization={item} />
-          ))}
+          {data &&
+            data.data.map((organization: any) => (
+              <OrganizationCard
+                key={organization.id}
+                organization={organization.organization}
+              />
+            ))}
         </div>
       </section>
       <section>
