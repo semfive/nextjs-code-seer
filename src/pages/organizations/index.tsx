@@ -1,4 +1,11 @@
-import { CreateOrgForm, Layout, OrganizationCard } from '@/components';
+'use client';
+
+import {
+  CreateOrgForm,
+  Layout,
+  OrganizationCard,
+  withPrivateRoute,
+} from '@/components';
 import { Organization } from '@/interfaces';
 import React, { useState } from 'react';
 import styles from './organizations.module.scss';
@@ -7,14 +14,8 @@ import {
   retrieveOrganizations,
   organizationEndpoint,
 } from '@/services/organization.service';
-
-const mockData = new Array<Organization>(4).fill({
-  organizationName: 'FPLMS',
-  type: 'Team-managed Software',
-  domains: 'Analytic tech debt',
-  numOfTeams: 2,
-  curRepo: 'Kenflix',
-});
+import useUser from '@/hooks/useUser';
+import PrivateRoute from '@/components/common/PrivateRoute';
 
 const organizationTypes = [
   'Onboarding',
@@ -31,7 +32,9 @@ const OrganizationList = () => {
     retrieveOrganizations
   );
 
-  console.log(data);
+  const user = useUser();
+
+  console.log(user);
 
   if (isLoading) return <h1 className='text-2xl font-bold'>Loading...</h1>;
 
@@ -90,5 +93,9 @@ const OrganizationList = () => {
 export default OrganizationList;
 
 OrganizationList.getLayout = function getLayout(page: any) {
-  return <Layout>{page}</Layout>;
+  return (
+    <PrivateRoute>
+      <Layout>{page}</Layout>
+    </PrivateRoute>
+  );
 };

@@ -1,13 +1,25 @@
 import Image from 'next/image';
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import background from '/public/welcome-background.png';
 import GithubIcon from '/public/github-icon.png';
 import { ButtonOutline } from '@/components';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import useUser from '@/hooks/useUser';
 
 const Login = () => {
   const router = useRouter();
+
+  const { token } = router.query;
+  if (token) {
+    localStorage.setItem('token', token as string);
+  }
+
+  const isLoggedIn = useUser();
+
+  useEffect(() => {
+    if (isLoggedIn !== null) router.push('/organizations');
+  }, []);
 
   return (
     <div className='relative h-full w-full flex justify-center items-center'>
