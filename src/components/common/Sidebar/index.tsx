@@ -159,15 +159,15 @@ const Sidebar = () => {
                 teamsCollapsed ? 'max-h-0' : 'max-h-[400px]'
               }`}
             >
-              {teams?.data.map((team: ITeam) => (
-                <li className='text-md_gray' key={team.team.id}>
+              {teams?.data?.map((team: ITeam) => (
+                <li className='text-md_gray' key={team.id}>
                   <button
                     className='w-fit hover:underline hover:font-semibold hover:text-dark_blue'
                     onClick={() =>
                       router.push(`/organizations/${organizationId}/teams/1`)
                     }
                   >
-                    {team.team.name}
+                    {team.name}
                   </button>
                 </li>
               ))}

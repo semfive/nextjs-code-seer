@@ -1,12 +1,18 @@
 import { ChevronDown, CloseIcon } from '@/components/icons';
 import { IDomain } from '@/interfaces/domain.interface';
 import { ITeam } from '@/interfaces/team.interface';
-import { createNewDomain, domainEndpoint } from '@/services/domain.service';
+import {
+  createNewDomain,
+  domainEndpoint,
+  retrieveGithubAccounts,
+  retrieveInstalledAppRepos,
+} from '@/services/domain.service';
 import dynamic from 'next/dynamic';
-import React, { useRef, useState } from 'react';
+import React, { MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { MutatorOptions } from 'swr';
 import jwt_decode from 'jwt-decode';
+import useUser from '@/hooks/useUser';
 
 interface ICreateDomainForm {
   teams: ITeam[];
@@ -23,11 +29,19 @@ const CreateDomainForm = ({
   domains,
 }: ICreateDomainForm) => {
   const labelDropdown = useRef<HTMLUListElement>(null);
+  const githubOrgsDropdown = useRef<HTMLUListElement>(null);
+  const reposDropdown = useRef<HTMLUListElement>(null);
+
   const [selectedTeam, setSelectedTeam] = useState<ITeam>();
   const [value, setValue] = useState('');
 
-  const token = localStorage.getItem('token');
-  const user: any = jwt_decode(token as string);
+  const [githubOrgs, setGithubOrgs] = useState<any[]>([]);
+  const [selectedGithubOrg, setSelectedGithubOrg] = useState('');
+
+  const [repos, setRepos] = useState<any[]>([]);
+  const [selectedRepo, setSelectedRepo] = useState('');
+
+  const user: any = useUser();
 
   const openLabelDropdown = () => {
     if (labelDropdown.current!!.classList.contains('invisible')) {
@@ -41,6 +55,30 @@ const CreateDomainForm = ({
     }
   };
 
+  const openGithubOrgsDropdown = () => {
+    if (githubOrgsDropdown.current!!.classList.contains('invisible')) {
+      githubOrgsDropdown.current!!.classList.toggle('opacity-0');
+      githubOrgsDropdown.current!!.classList.toggle('invisible');
+    } else {
+      githubOrgsDropdown.current!!.classList.toggle('opacity-0');
+      setTimeout(() => {
+        githubOrgsDropdown.current!!.classList.toggle('invisible');
+      }, 100);
+    }
+  };
+
+  const openReposDropdown = () => {
+    if (reposDropdown.current!!.classList.contains('invisible')) {
+      reposDropdown.current!!.classList.toggle('opacity-0');
+      reposDropdown.current!!.classList.toggle('invisible');
+    } else {
+      reposDropdown.current!!.classList.toggle('opacity-0');
+      setTimeout(() => {
+        reposDropdown.current!!.classList.toggle('invisible');
+      }, 100);
+    }
+  };
+
   const closeModal = () => {
     setIsShown(false);
   };
@@ -50,34 +88,41 @@ const CreateDomainForm = ({
     openLabelDropdown();
   };
 
+  const selectGithubOrg = (event: any, githubOrg: string) => {
+    event.stopPropagation();
+    setSelectedGithubOrg(githubOrg);
+    openGithubOrgsDropdown();
+  };
+
+  const selectRepo = (event: any, repo: string) => {
+    event.stopPropagation();
+    setSelectedRepo(repo);
+    openReposDropdown();
+  };
+
   const handleCreateDomain = async (event: any) => {
     event.preventDefault();
-    const { domainName, domainDirectory, domainRepository } = event.target;
+    const { domainName, domainDirectory } = event.target;
 
     try {
       await mutate(
         domainEndpoint,
-        async () => {
-          const data = createNewDomain({
-            teamId: selectedTeam?.teamId as string,
-            payload: {
-              name: domainName.value,
-              directory: domainDirectory.value,
-              repository: domainRepository.value,
-            },
-          });
-          return data;
-        },
+        createNewDomain({
+          teamId: selectedTeam?.id as string,
+          payload: {
+            name: domainName.value,
+            directory: domainDirectory.value,
+            repository: selectedRepo,
+          },
+        }),
         {
           optimisticData: [
             ...domains,
             {
-              teamId: selectedTeam?.teamId as string,
-              payload: {
-                name: domainName.value,
-                directory: domainDirectory.value,
-                repository: domainRepository.value,
-              },
+              teamId: selectedTeam?.id as string,
+              name: domainName.value,
+              directory: domainDirectory.value,
+              repository: selectedRepo,
             },
           ],
           rollbackOnError: true,
@@ -94,6 +139,27 @@ const CreateDomainForm = ({
       });
     }
   };
+
+  useEffect(() => {
+    const fetchGithubOrgs = async () => {
+      const data = await retrieveGithubAccounts(user.githubToken);
+      if (data) {
+        setGithubOrgs([user.login, ...data.map((item: any) => item.login)]);
+        setSelectedGithubOrg(user.login);
+      }
+    };
+
+    fetchGithubOrgs();
+  }, []);
+
+  useEffect(() => {
+    const fetchInstalledAppRepos = async () => {
+      const data = await retrieveInstalledAppRepos(selectedGithubOrg);
+      setRepos(data);
+      setSelectedRepo(data[0].full_name);
+    };
+    if (selectedGithubOrg !== '') fetchInstalledAppRepos();
+  }, [selectedGithubOrg]);
 
   return (
     <section className='fixed inset-0  py-14  flex justify-center z-20'>
@@ -123,19 +189,41 @@ const CreateDomainForm = ({
               required
             />
           </div>
-          <div className='flex flex-col gap-3'>
-            <label htmlFor='domain_account' className='text-lg font-medium'>
-              Accounts
+          <div className='flex flex-col gap-3 relative'>
+            <label htmlFor='organization_login' className='text-lg font-medium'>
+              Account/Organization
             </label>
-            <input
-              id='domain_account'
-              name='domainAccount'
-              type='text'
-              className='py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500'
-              placeholder='Ken-nguyen-2000'
-              defaultValue={user.email}
-              required
-            />
+            <button
+              type='button'
+              className='relative w-full'
+              onClick={openGithubOrgsDropdown}
+            >
+              <div className='flex items-center justify-between py-4 px-7 border border-gray-400 rounded-md text-gray-500'>
+                <span>
+                  {selectedGithubOrg
+                    ? selectedGithubOrg
+                    : 'Account/Organization'}
+                </span>
+                <ChevronDown className='w-5 h-5' />
+              </div>
+              <ul
+                ref={githubOrgsDropdown}
+                className='create-organization-label__dropdown absolute top-full z-10 mt-2 max-h-56 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition ease-in duration-100 opacity-0 invisible text-left'
+                role='listbox'
+              >
+                {githubOrgs?.map((githubOrg: any) => (
+                  <li
+                    key={githubOrg}
+                    className='py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white'
+                    role='option'
+                    aria-selected
+                    onClick={(e) => selectGithubOrg(e, githubOrg)}
+                  >
+                    {githubOrg}
+                  </li>
+                ))}
+              </ul>
+            </button>
             <a
               href='https://github.com/apps/codeseer-bot/'
               className='text-drark_blue underline'
@@ -143,18 +231,39 @@ const CreateDomainForm = ({
               + Add new accounts/organizations
             </a>
           </div>
-          <div className='flex flex-col gap-3'>
-            <label htmlFor='domain_repository' className='text-lg font-medium'>
-              Repositories
+
+          <div className='flex flex-col gap-3 relative'>
+            <label htmlFor='organization_login' className='text-lg font-medium'>
+              Repository
             </label>
-            <input
-              id='domain_repository'
-              name='domainRepository'
-              type='text'
-              className='py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500'
-              placeholder='Lost-and-Found, Facebook-clone,...'
-              required
-            />
+            <button
+              type='button'
+              className='relative w-full'
+              onClick={openReposDropdown}
+            >
+              <div className='flex items-center justify-between py-4 px-7 border border-gray-400 rounded-md text-gray-500'>
+                <span>{selectedRepo ? selectedRepo : 'repository'}</span>
+                <ChevronDown className='w-5 h-5' />
+              </div>
+              <ul
+                ref={reposDropdown}
+                className='create-organization-label__dropdown absolute top-full z-10 mt-2 max-h-56 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition ease-in duration-100 opacity-0 invisible text-left'
+                role='listbox'
+              >
+                {repos?.map((repo: any) => (
+                  <li
+                    key={repo.id}
+                    className='py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white'
+                    role='option'
+                    aria-selected
+                    onClick={(e) => selectRepo(e, repo.full_name)}
+                  >
+                    {repo.full_name}
+                  </li>
+                ))}
+              </ul>
+            </button>
+
             <a
               href='https://github.com/apps/magim-bot'
               className='text-drark_blue underline'
@@ -185,7 +294,7 @@ const CreateDomainForm = ({
               onClick={openLabelDropdown}
             >
               <div className='flex items-center justify-between py-4 px-7 border border-gray-400 rounded-md text-gray-500'>
-                <span>{selectedTeam ? selectedTeam.team.name : 'Team'}</span>
+                <span>{selectedTeam ? selectedTeam.name : 'Team'}</span>
                 <ChevronDown className='w-5 h-5' />
               </div>
             </button>
@@ -196,13 +305,13 @@ const CreateDomainForm = ({
             >
               {teams.map((team: ITeam) => (
                 <li
-                  key={team.teamId}
+                  key={team.id}
                   className='py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white'
                   role='option'
                   aria-selected
                   onClick={selectAssignedTeam.bind(null, team)}
                 >
-                  {team.team.name}
+                  {team.name}
                 </li>
               ))}
             </ul>

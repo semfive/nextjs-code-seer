@@ -15,6 +15,7 @@ import FloatingActionBar from './common/FloatingActionBar';
 import CreateOrgForm from './common/CreateOrgForm';
 import CreateDomainForm from './common/CreateDomainForm';
 import CreateTeamForm from './common/CreateTeamForm';
+import withPrivateRoute from './Layout/withPrivateRoute';
 
 export {
   ButtonOutline,
@@ -34,4 +35,5 @@ export {
   CreateOrgForm,
   CreateDomainForm,
   CreateTeamForm,
+  withPrivateRoute,
 };

@@ -21,6 +21,8 @@ const CreateOrgForm = ({ isShown, setIsShown }: any) => {
     description: '',
   });
 
+  const formRef = useRef<HTMLFormElement>(null);
+
   const openLabelDropdown = () => {
     if (labelDropdown.current !== null) {
       if (labelDropdown.current.style.visibility !== 'visible') {
@@ -39,7 +41,9 @@ const CreateOrgForm = ({ isShown, setIsShown }: any) => {
   };
 
   const closeModal = () => {
-    setIsShown(false);
+    formRef.current!!.style.animation = 'scaleOut 200ms ease-in-out forwards';
+
+    setTimeout(() => setIsShown(false), 300);
   };
 
   const selectLabelItem = (label: string) => {
@@ -118,7 +122,11 @@ const CreateOrgForm = ({ isShown, setIsShown }: any) => {
         className={`${styles.overlay}  backdrop-brightness-75 backdrop-blur-sm`}
         onClick={closeModal}
       />
-      <form onSubmit={handleCreateOrg} className={styles.form__wrapper}>
+      <form
+        onSubmit={handleCreateOrg}
+        className={styles.form__wrapper}
+        ref={formRef}
+      >
         <div className={styles.form__header}>
           <h1 className={styles.form__header__h1}>Create Organization</h1>
           <EyeClosedIcon onClick={closeModal} className='cursor-pointer' />
