@@ -1,16 +1,9 @@
 export interface ITeam {
   id: string;
-  teamId: string;
-  organizationId: string;
+  login: string;
+  name: string;
   createdAt?: string;
   updatedAt?: string;
-  team: {
-    id: string;
-    login: string;
-    name: string;
-    createdAt?: string;
-    updatedAt?: string;
-  };
 }
 
 export interface ICreateTeam {
