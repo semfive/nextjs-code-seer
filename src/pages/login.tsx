@@ -19,7 +19,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isLoggedIn !== null) router.push('/organizations');
-  }, []);
+  }, [isLoggedIn, router]);
 
   return (
     <div className='relative h-full w-full flex justify-center items-center'>

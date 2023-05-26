@@ -9,7 +9,7 @@ const PrivateRoute = ({ children }: any) => {
   console.log(user);
   useEffect(() => {
     if (user === null) router.push('/login');
-  }, []);
+  }, [router, user]);
 
   return <>{children}</>;
 };
