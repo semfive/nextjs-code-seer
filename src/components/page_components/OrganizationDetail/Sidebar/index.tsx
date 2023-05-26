@@ -7,7 +7,7 @@ import {
   CircleChevronRight,
   PlusIcon,
   SettingsIcon,
-} from '../../icons';
+} from '../../../icons';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { retrieveTeams, teamEndpoint } from '@/services/team.service';
@@ -16,9 +16,13 @@ import { domainEndpoint, retrieveDomains } from '@/services/domain.service';
 import { IDomain } from '@/interfaces/domain.interface';
 import CreateTeamForm from '../CreateTeamForm';
 import CreateDomainForm from '../CreateDomainForm';
+import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
+import { setDomain } from '@/redux/slices/domainSlice';
 
 const Sidebar = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const domain = useAppSelector((state) => state.domain.domain);
   const { organizationId } = router.query;
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -119,9 +123,12 @@ const Sidebar = () => {
                 <li className='text-md_gray' key={domain.domainId}>
                   <button
                     className='w-fit hover:underline hover:font-semibold hover:text-dark_blue'
-                    onClick={() =>
-                      router.push(`/organizations/${organizationId}`)
-                    }
+                    onClick={() => {
+                      dispatch(setDomain(domain));
+                      router.push(
+                        `/organizations/${organizationId}/${domain.domainId}`
+                      );
+                    }}
                   >
                     {domain.domain.name}
                   </button>

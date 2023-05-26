@@ -1,3 +1,5 @@
+'use client';
+
 import { ChevronDown, CloseIcon } from '@/components/icons';
 import { IDomain } from '@/interfaces/domain.interface';
 import { ITeam } from '@/interfaces/team.interface';

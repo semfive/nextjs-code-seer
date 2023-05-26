@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import React, { useContext, useEffect } from 'react';
 import background from '/public/welcome-background.png';

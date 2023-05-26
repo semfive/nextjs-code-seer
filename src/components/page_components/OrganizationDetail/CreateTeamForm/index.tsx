@@ -1,3 +1,5 @@
+'use client';
+
 import { ChevronDown, CloseIcon } from '@/components/icons';
 import { createNewTeam } from '@/services/team.service';
 import React, { useRef, useState } from 'react';

@@ -7,6 +7,7 @@ import 'reactflow/dist/style.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-quill/dist/quill.snow.css';
+import Providers from '@/components/common/Providers';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -21,8 +22,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <ReactFlowProvider>
-      <ToastContainer />
-      {getLayout(<Component {...pageProps} />)}
+      <Providers>
+        <ToastContainer />
+        {getLayout(<Component {...pageProps} />)}
+      </Providers>
     </ReactFlowProvider>
   );
 }

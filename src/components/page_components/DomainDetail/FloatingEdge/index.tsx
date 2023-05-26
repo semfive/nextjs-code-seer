@@ -1,3 +1,5 @@
+'use client';
+
 import { getEdgeParams } from '@/utils/helpers';
 import { useCallback } from 'react';
 import { getBezierPath, useStore } from 'reactflow';

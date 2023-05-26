@@ -1,3 +1,5 @@
+'use client';
+
 import { ChevronDown, EyeClosedIcon } from '@/components/icons';
 import React, { useRef, useState } from 'react';
 import dynamic from 'next/dynamic';

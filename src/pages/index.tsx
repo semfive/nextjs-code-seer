@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import background from '/public/welcome-background.png';
 import CodeSeerLogo from '/public/codeseer-logo.png';

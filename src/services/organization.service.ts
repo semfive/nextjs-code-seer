@@ -14,12 +14,10 @@ export const retrieveOrganizations = async (): Promise<AxiosResponse> => {
   return res.data;
 };
 
-export const retrieveAnOrganization = async (
-  key: string
-): Promise<AxiosResponse> => {
+export const retrieveAnOrganization = async (key: string) => {
   const res = await interceptor.get(key);
 
-  return res.data;
+  return res.data.data;
 };
 
 export const createNewOrganization = async (

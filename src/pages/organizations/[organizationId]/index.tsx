@@ -1,19 +1,21 @@
-import { CommitChanges, Layout } from '@/components';
+'use client';
+
+import { CommitChanges, Layout, Sidebar } from '@/components';
 import { useRouter } from 'next/router';
 import React from 'react';
 import MapVersion from '/public/map-version.png';
 import Image from 'next/image';
-import Sidebar from '@/components/common/Sidebar';
 import useSWR from 'swr';
 import {
   organizationEndpoint,
   retrieveAnOrganization,
 } from '@/services/organization.service';
-import { retrieveTeams, teamEndpoint } from '@/services/team.service';
+import PrivateRoute from '@/components/common/PrivateRoute';
+import { useAppDispatch } from '@/redux/reduxHooks';
+import { setOrganization } from '@/redux/slices/organizationSlice';
 
 const OrganizationDetail = () => {
   const router = useRouter();
-
   const { organizationId } = router.query;
   const {
     data: organization,
@@ -23,6 +25,9 @@ const OrganizationDetail = () => {
     organizationId ? `${organizationEndpoint}/${organizationId}` : null,
     retrieveAnOrganization
   );
+  const dispatch = useAppDispatch();
+
+  if (organization) dispatch(setOrganization(organization));
 
   if (isOrgLoading) return <h1>Loading</h1>;
 
@@ -38,11 +43,11 @@ const OrganizationDetail = () => {
               <li
                 key={index}
                 role='button'
-                onClick={() =>
+                onClick={() => {
                   router.push(
                     `/organizations/${organizationId}/dependency-map/${index}`
-                  )
-                }
+                  );
+                }}
               >
                 <Image src={MapVersion} alt='Dependency Map' priority={true} />
               </li>
@@ -73,11 +78,13 @@ export default OrganizationDetail;
 
 OrganizationDetail.getLayout = function getLayout(page: any) {
   return (
-    <Layout>
-      <main className='flex-grow flex bg-[#f5f5f5]'>
-        <Sidebar />
-        {page}
-      </main>
-    </Layout>
+    <PrivateRoute>
+      <Layout>
+        <main className='flex-grow flex bg-[#f5f5f5]'>
+          <Sidebar />
+          {page}
+        </main>
+      </Layout>
+    </PrivateRoute>
   );
 };

@@ -1,8 +1,11 @@
+'use client';
+
 import {
   EyeClosedIcon,
   EyeFilledIcon,
   FileCodeIcon,
   FolderIcon,
+  TypescriptFileIcon,
 } from '@/components/icons';
 import React, { useState } from 'react';
 
@@ -14,8 +17,15 @@ const FolderTree = ({ explorer }: any) => {
     if (!explorer.name.includes('.')) {
       return <FolderIcon className='w-6 h-6' />;
     }
-    return <FileCodeIcon className='w-6 h-6' />;
+    return explorer.name.split('.').includes('ts') ? (
+      <TypescriptFileIcon className='w-6 h-6' />
+    ) : (
+      <FileCodeIcon className='w-6 h-6' />
+    );
   };
+
+  const getText = (text: string) =>
+    text.includes('.') ? text.split('/')[text.split('/').length - 1] : text;
 
   return (
     <section>
@@ -25,7 +35,10 @@ const FolderTree = ({ explorer }: any) => {
           className='flex flex-grow items-center font-medium gap-2 my-1 text-ellipsis overflow-hidden whitespace-nowrap hover:text-primary_blue '
           onClick={() => setIsExpand(!isExpand)}
         >
-          {getIcon()} {explorer.name}
+          <span className='flex-shrink'>{getIcon()}</span>
+          <span className='text-ellipsis overflow-hidden'>
+            {getText(explorer.name)}
+          </span>
         </button>
         {visible ? (
           <EyeFilledIcon

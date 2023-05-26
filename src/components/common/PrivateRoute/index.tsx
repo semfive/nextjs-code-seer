@@ -1,3 +1,5 @@
+'use client';
+
 import useUser from '@/hooks/useUser';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';

@@ -19,6 +19,7 @@ import ChevronRight from './ChevronRight';
 import ClipboardText from './ClipboardText';
 import TagIcon from './TagIcon';
 import CloseIcon from './CloseIcon';
+import TypescriptFileIcon from './TypescriptFileIcon';
 
 export {
   BellFilledIcon,
@@ -42,4 +43,5 @@ export {
   ClipboardText,
   TagIcon,
   CloseIcon,
+  TypescriptFileIcon,
 };
