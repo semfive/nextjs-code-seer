@@ -342,3 +342,58 @@ export const getAllPosibleEdge = (
 
   return interSectionsEdges;
 };
+
+export function getAllChildNodes(node: Node, nodes: Node[]) {
+  // const childNodes = [];
+  // if (node.data.children.length > 0) {
+  //   const childNodes = nodes.filter(
+  //     (n) => node.data.children.find((c: any) => c.name === n.id) !== undefined
+  //   );
+  //   childNodes.forEach((cN: Node) => {
+  //     if (!cN.id.includes('') && cN.data.isExpand)
+  //       getAllChildNodes(cN, nodes, [...list, ...childNodes]);
+  //   });
+  // }
+  console.log(nodes);
+
+  const chilren: Node[] = [];
+  const findChildren = (currentNode: Node, parentNode: Node) => {
+    if (
+      currentNode.parentNode === parentNode.id &&
+      !currentNode.data.isExpand
+    ) {
+      chilren.push(currentNode);
+    }
+
+    nodes.forEach((n: Node) => {
+      if (n.parentNode === currentNode.id) {
+        findChildren(n, currentNode);
+      }
+    });
+  };
+
+  findChildren(node, node);
+
+  return chilren;
+}
+
+// function getAllChildren(tree, nodeId) {
+//   const children = [];
+
+//   const findChildren = (currentNode) => {
+//     if (currentNode.parent === nodeId) {
+//       children.push(currentNode);
+//     }
+
+//     tree.forEach((node) => {
+//       if (node.parent === currentNode.id) {
+//         findChildren(node);
+//       }
+//     });
+//   };
+
+//   // Find all children starting from the given node
+//   findChildren({ id: nodeId });
+
+//   return children;
+// }

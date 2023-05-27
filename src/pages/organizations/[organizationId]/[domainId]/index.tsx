@@ -46,6 +46,7 @@ import {
   getChildrenBiggestSize,
   generateInitSetup,
   getAllPosibleEdge,
+  getAllChildNodes,
 } from '@/utils/code-maps/helpers';
 import { IMainData } from '@/utils/code-maps/helpers.interface';
 import PrivateRoute from '@/components/common/PrivateRoute';
@@ -55,6 +56,7 @@ import { setDependencyMaps } from '@/redux/slices/domainSlice';
 import { IDomain, IWorkflow } from '@/interfaces/domain.interface';
 import { IOrganization } from '@/interfaces';
 import useUser from '@/hooks/useUser';
+import Link from 'next/link';
 
 const padding = 10;
 const gap = 10;
@@ -85,6 +87,7 @@ function Codebase() {
   const [explorer, setExplorer] = useState<any[]>([]);
   const [depMaps, setDepMaps] = useState([]);
   const [workflowRunning, setWorkflowRunning] = useState(false);
+  const [showRedirect, setShowRedirect] = useState(false);
 
   const nodeTypes: NodeTypes = useMemo(
     () => ({
@@ -109,6 +112,7 @@ function Codebase() {
     [setEdges]
   );
 
+  /** *************Click Event********** */
   const createNewEdges = (selectedNode: Node, newNodes: Node[]) => {
     const allNodes = nodes
       .concat(newNodes)
@@ -170,7 +174,9 @@ function Codebase() {
                 type: MarkerType.ArrowClosed,
               },
             };
-            egdesMap.set(edgeData.id, edgeData);
+            if (source !== target) {
+              egdesMap.set(edgeData.id, edgeData);
+            }
           }
         }
       });
@@ -449,8 +455,11 @@ function Codebase() {
   };
 
   const handleHightLightEdges = (node: Node) => {
-    const incomerEdges = getConnectedEdges([node], edges);
-    console.log('Hight light Edges', incomerEdges);
+    let incomerEdges = getConnectedEdges([node], edges);
+    if (!node.id.includes('.')) {
+      incomerEdges = getConnectedEdges(getAllChildNodes(node, nodes), edges);
+    }
+    // console.log('Hight light Edges', incomerEdges);
     setEdges((prev) =>
       prev.map((edge: Edge) => {
         const exactEdge = incomerEdges.find((e) => e.id === edge.id);
@@ -459,12 +468,12 @@ function Codebase() {
             ...exactEdge,
             style: {
               ...exactEdge.style,
-              strokeWidth: 2,
-              stroke: '#000',
+              strokeWidth: 1.5,
+              stroke: '#333',
             },
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: '#000',
+              color: '#333',
             },
           };
         }
@@ -473,24 +482,36 @@ function Codebase() {
           ...edge,
           markerEnd: {
             type: MarkerType.ArrowClosed,
+            color: '#33333361',
           },
-          style: {},
+          style: {
+            strokeWidth: 1,
+            stroke: '#33333361',
+          },
         };
       })
     );
   };
 
   const onNodeClick = async (event: any, node: Node) => {
+    console.log('Edges', edges);
+
     if (node.data.label.includes('.')) {
       handleHightLightEdges(node);
     } else {
       if (!node.data.isExpand) {
         expandNode(node);
         createNewNodes(node);
+      } else {
+        handleHightLightEdges(node);
       }
     }
   };
 
+  /** *************Drag Event********** */
+  const handleNodeDrag = () => {};
+
+  /**     *******Services*********      */
   const handleGetWorkflow = async ({
     owner,
     repository,
@@ -559,6 +580,7 @@ function Codebase() {
       console.log(res);
       if (res.success) {
         toast.success('Run workflow success');
+        setShowRedirect(true);
       }
     } catch (error) {
       console.log(error);
@@ -618,10 +640,20 @@ function Codebase() {
           <ClipboardText className='text-dark_blue_2 cursor-pointer' />
         </div>
         {depMaps.length === 0 ? (
-          <div className='flex grow w-full h-screen justify-center items-center relative'>
+          <div className='flex flex-col grow w-full h-screen justify-center items-center relative'>
             <ButtonOutline className='rounded-md' onClick={handleRunWorkflow}>
               Run work flow
             </ButtonOutline>
+            {showRedirect && (
+              <Link
+                href={`https://github.com/${domain?.repository.split('/')[0]}/${
+                  domain?.repository.split('/')[1]
+                }/actions`}
+                className='hover:underline py-2'
+              >
+                View workflow progress
+              </Link>
+            )}
           </div>
         ) : (
           <div className='flex grow w-full h-screen relative'>
@@ -637,6 +669,7 @@ function Codebase() {
               edgeTypes={edgeTypes}
               fitView
               onNodeClick={onNodeClick}
+              onNodeDrag={handleNodeDrag}
             >
               <MiniMap />
               <Controls />
