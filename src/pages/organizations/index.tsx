@@ -57,7 +57,7 @@ const OrganizationList = () => {
           </a>
         </div>
 
-        <div className='flex md:flex-wrap flex-col md:flex-row gap-8'>
+        <div className='flex md:flex-wrap flex-col md:flex-row gap-8 min-h-[150px]'>
           {data &&
             data.data.map((organization: any) => (
               <OrganizationCard

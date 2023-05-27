@@ -10,6 +10,12 @@ export const retrieveTeams = async (url: string) => {
   return res.data;
 };
 
+export const retrieveJoinedTeams = async (url: string) => {
+  const res = await interceptor.get(url);
+
+  return res.data;
+};
+
 export const createNewTeam = async ({ orgId, payload }: ICreateTeam) => {
   const res = await interceptor.post(teamEndpoint, {
     organizationId: orgId,

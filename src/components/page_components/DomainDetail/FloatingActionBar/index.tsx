@@ -7,13 +7,13 @@ const FloatingActionBar = () => {
       <div className='flex gap-3'>
         <button
           type='button'
-          className='py-1 px-2 text-lg font-semibold bg-drark_blue text-white rounded-md'
+          className='py-1 px-2 text-lg font-semibold bg-dark_blue text-white rounded-md'
         >
           Comments
         </button>
         <button
           type='button'
-          className='py-1 px-2 text-lg font-semibold bg-white text-drark_blue rounded-md border border-light_gray hover:bg-drark_blue hover:text-white hover:border-drark_blue'
+          className='py-1 px-2 text-lg font-semibold bg-white text-darbg-dark_blue rounded-md border border-light_gray hover:bg-dark_blue hover:text-white hover:border-darbg-dark_blue'
         >
           Label
         </button>
@@ -30,7 +30,7 @@ const FloatingActionBar = () => {
       </div>
       <button
         type='button'
-        className='flex items-center gap-2 bg-white py-1 px-2 border border-light_gray rounded-md hover:bg-drark_blue hover:text-white'
+        className='flex items-center gap-2 bg-white py-1 px-2 border border-light_gray rounded-md hover:bg-dark_blue hover:text-white'
       >
         <PlusIcon className='w-5 h-5' />
         <span className='font-medium'>Add new comments</span>

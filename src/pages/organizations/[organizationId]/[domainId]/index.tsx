@@ -7,6 +7,8 @@ import {
   Background,
   Controls,
   Edge,
+  getConnectedEdges,
+  getIncomers,
   MarkerType,
   MiniMap,
   Node,
@@ -24,6 +26,7 @@ import {
   FloatingConnectionLine,
   FloatingEdge,
   ButtonOutline,
+  Loader,
 } from '@/components';
 import './dependency-map.module.scss';
 import {
@@ -445,14 +448,46 @@ function Codebase() {
     }
   };
 
+  const handleHightLightEdges = (node: Node) => {
+    const incomerEdges = getConnectedEdges([node], edges);
+    console.log('Hight light Edges', incomerEdges);
+    setEdges((prev) =>
+      prev.map((edge: Edge) => {
+        const exactEdge = incomerEdges.find((e) => e.id === edge.id);
+        if (exactEdge) {
+          return {
+            ...exactEdge,
+            style: {
+              ...exactEdge.style,
+              strokeWidth: 2,
+              stroke: '#000',
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: '#000',
+            },
+          };
+        }
+
+        return {
+          ...edge,
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+          },
+          style: {},
+        };
+      })
+    );
+  };
+
   const onNodeClick = async (event: any, node: Node) => {
     if (node.data.label.includes('.')) {
-      return;
-    }
-
-    if (!node.data.isExpand) {
-      expandNode(node);
-      createNewNodes(node);
+      handleHightLightEdges(node);
+    } else {
+      if (!node.data.isExpand) {
+        expandNode(node);
+        createNewNodes(node);
+      }
     }
   };
 
@@ -484,43 +519,45 @@ function Codebase() {
   };
 
   const handleTrackingWorkflow = async () => {
-    if (!domain) return;
-    try {
-      const owner = domain.domain.repository.split('/')[0];
-      const repository = domain.domain.repository.split('/')[1];
-      const res = await retrieveWorkflows({
-        owner,
-        repository,
-        githubToken: user.githubToken,
-      });
-      setWorkflowRunning(true);
+    if (domain) {
+      try {
+        const owner = domain.repository.split('/')[0];
+        const repository = domain.repository.split('/')[1];
+        const res = await retrieveWorkflows({
+          owner,
+          repository,
+          githubToken: user.githubToken,
+        });
+        setWorkflowRunning(true);
 
-      const { workflows_run } = res;
-      const in_progress_workflows = workflows_run.filter(
-        (workflow_run: any) => workflow_run.status !== 'completed'
-      );
+        const { workflow_runs } = res;
+        const in_progress_workflows = workflow_runs.filter(
+          (workflow_run: any) => workflow_run.status !== 'completed'
+        );
 
-      const workflow = await handleGetWorkflow({
-        owner,
-        repository,
-        githubToken: user.githubToken,
-        workflowId: in_progress_workflows[0].id,
-      });
-
-      if (workflow.status === 'completed') setWorkflowRunning(false);
-    } catch (error) {
-      console.log(error);
+        if (in_progress_workflows.length > 0) {
+          const workflow = await handleGetWorkflow({
+            owner,
+            repository,
+            githubToken: user.githubToken,
+            workflowId: in_progress_workflows[0].id,
+          });
+          if (workflow.status === 'completed') setWorkflowRunning(false);
+        }
+        setWorkflowRunning(false);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
   const handleRunWorkflow = async () => {
     try {
-      const owner = domain?.domain.repository.split('/')[0] as string;
-      const repository = domain?.domain.repository.split('/')[1] as string;
+      const owner = domain?.repository.split('/')[0] as string;
+      const repository = domain?.repository.split('/')[1] as string;
       const res = await runWorkflow({ owner, repository });
       console.log(res);
       if (res.success) {
-        handleTrackingWorkflow();
         toast.success('Run workflow success');
       }
     } catch (error) {
@@ -550,7 +587,13 @@ function Codebase() {
     if (domainId) fetchMaps();
   }, [dispatch, domainId, setEdges, setNodes]);
 
-  if (workflowRunning) return <h1>Tracking workflow progress</h1>;
+  if (workflowRunning)
+    return (
+      <div className='w-full h-screen flex justify-between items-center'>
+        <h1>Loading....</h1>
+        {/* <Loader /> */}
+      </div>
+    );
 
   return (
     <div className='w-full h-screen flex overflow-hidden'>
@@ -563,12 +606,12 @@ function Codebase() {
             </span>
             <ChevronRight className='text-md_blue' />
             <span className='text-primary_gray'>
-              {domain ? domain.domain.name : 'Domain Name'}
+              {domain ? domain.name : 'Domain Name'}
             </span>
             <ChevronRight className='text-md_blue' />
             <span className='text-primary_blue'>
               {domain
-                ? domain.domain.repository
+                ? domain.repository
                 : 'Kennguyen2000/facebook-instagram-mobile'}
             </span>
           </div>

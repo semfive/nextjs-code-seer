@@ -110,7 +110,7 @@ const CreateDomainForm = ({
       await mutate(
         domainEndpoint,
         createNewDomain({
-          teamId: selectedTeam?.id as string,
+          teamId: selectedTeam?.team.id as string,
           payload: {
             name: domainName.value,
             directory: domainDirectory.value,
@@ -296,7 +296,7 @@ const CreateDomainForm = ({
               onClick={openLabelDropdown}
             >
               <div className='flex items-center justify-between py-4 px-7 border border-gray-400 rounded-md text-gray-500'>
-                <span>{selectedTeam ? selectedTeam.name : 'Team'}</span>
+                <span>{selectedTeam ? selectedTeam.team.name : 'Team'}</span>
                 <ChevronDown className='w-5 h-5' />
               </div>
             </button>
@@ -307,13 +307,13 @@ const CreateDomainForm = ({
             >
               {teams.map((team: ITeam) => (
                 <li
-                  key={team.id}
+                  key={team.teamId}
                   className='py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white'
                   role='option'
                   aria-selected
                   onClick={selectAssignedTeam.bind(null, team)}
                 >
-                  {team.name}
+                  {team.team.name}
                 </li>
               ))}
             </ul>

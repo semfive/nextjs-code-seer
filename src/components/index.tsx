@@ -17,6 +17,7 @@ import CreateDomainForm from './page_components/OrganizationDetail/CreateDomainF
 import CreateTeamForm from './page_components/OrganizationDetail/CreateTeamForm';
 import LoadingWorkFlow from './page_components/DomainDetail/LoadingWorkFlow';
 import withPrivateRoute from './Layout/withPrivateRoute';
+import Loader from './common/Loader';
 
 export {
   ButtonOutline,
@@ -38,4 +39,5 @@ export {
   withPrivateRoute,
   LoadingWorkFlow,
   Sidebar,
+  Loader,
 };

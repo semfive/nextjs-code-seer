@@ -30,10 +30,7 @@ export const runWorkflow = async ({ owner, repository }: IRunWorkflow) => {
   return res.data;
 };
 
-export const createNewDomain = async ({
-  teamId,
-  payload,
-}: ICreateDomain): Promise<any> => {
+export const createNewDomain = async ({ teamId, payload }: ICreateDomain) => {
   const res = await interceptor.post('/domains', {
     teamId,
     payload,

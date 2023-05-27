@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import styles from './Sidebar.module.scss';
 import {
@@ -10,7 +12,7 @@ import {
 } from '../../../icons';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
-import { retrieveTeams, teamEndpoint } from '@/services/team.service';
+import { joinTeam, retrieveTeams, teamEndpoint } from '@/services/team.service';
 import { ITeam } from '@/interfaces/team.interface';
 import { domainEndpoint, retrieveDomains } from '@/services/domain.service';
 import { IDomain } from '@/interfaces/domain.interface';
@@ -19,6 +21,7 @@ import CreateDomainForm from '../CreateDomainForm';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
 import { setDomain } from '@/redux/slices/domainSlice';
 import ButtonFilled from '@/components/common/ButtonFilled';
+import { toast } from 'react-toastify';
 
 const Sidebar = () => {
   const router = useRouter();
@@ -38,13 +41,25 @@ const Sidebar = () => {
     error: teamsErr,
     isLoading: isTeamLoading,
     mutate: mutateTeam,
-  } = useSWR(teamEndpoint, retrieveTeams);
+  } = useSWR(teamEndpoint + `?orgId=${organizationId}`, retrieveTeams);
   const {
     data: domains,
     error: domainsErr,
     isLoading: isDomainsLoading,
     mutate: mutateDomain,
   } = useSWR(domainEndpoint, retrieveDomains);
+
+  const handleJoinTeam = async (teamId: string) => {
+    try {
+      const res = await joinTeam({
+        url: teamEndpoint + '/members/join',
+        teamId: teamId,
+        orgId: organizationId as string,
+      });
+
+      if (res.success) toast.success('Join team successfully!');
+    } catch (error) {}
+  };
 
   // if (isTeamLoading || isDomainsLoading) return <h1>Loading</h1>;
 
@@ -55,9 +70,10 @@ const Sidebar = () => {
           setIsShown={setShowCreateTeam}
           orgId={organizationId}
           mutate={mutateTeam}
+          teams={teams.data}
         />
       )}
-      {showCreateDomain && teams && (
+      {showCreateDomain && teams && domains && (
         <CreateDomainForm
           setIsShown={setShowCreateDomain}
           teams={teams.data}
@@ -126,17 +142,17 @@ const Sidebar = () => {
               }`}
             >
               {domains?.data?.map((domain: IDomain) => (
-                <li className='text-md_gray' key={domain.domainId}>
+                <li className='text-md_gray' key={domain.id}>
                   <button
                     className='w-fit hover:underline hover:font-semibold hover:text-dark_blue'
                     onClick={() => {
                       dispatch(setDomain(domain));
                       router.push(
-                        `/organizations/${organizationId}/${domain.domainId}`
+                        `/organizations/${organizationId}/${domain.id}`
                       );
                     }}
                   >
-                    {domain.domain.name}
+                    {domain.name}
                   </button>
                 </li>
               ))}
@@ -173,17 +189,26 @@ const Sidebar = () => {
               }`}
             >
               {teams?.data?.map((team: ITeam) => (
-                <li className='text-md_gray' key={team.id}>
+                <li
+                  className='text-md_gray flex justify-between items-center'
+                  key={team.id}
+                >
                   <button
                     className='w-fit hover:underline hover:font-semibold hover:text-dark_blue'
                     onClick={() =>
                       router.push(`/organizations/${organizationId}/teams/1`)
                     }
                   >
-                    {team.name}
+                    {team.team.name}
                   </button>
 
-                  <ButtonFilled>Join</ButtonFilled>
+                  <ButtonFilled
+                    className='text-xs px-3 rounded-full'
+                    style={{ padding: '4px 12px' }}
+                    onClick={handleJoinTeam.bind(null, team.team.id)}
+                  >
+                    Join
+                  </ButtonFilled>
                 </li>
               ))}
             </ul>

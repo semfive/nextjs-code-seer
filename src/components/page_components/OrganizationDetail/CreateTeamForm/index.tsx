@@ -1,10 +1,11 @@
 'use client';
 
 import { ChevronDown, CloseIcon } from '@/components/icons';
-import { createNewTeam } from '@/services/team.service';
+import { createNewTeam, teamEndpoint } from '@/services/team.service';
 import React, { useRef, useState } from 'react';
+import { MutatorOptions } from 'swr';
 
-const CreateTeamForm = ({ setIsShown, orgId }: any) => {
+const CreateTeamForm = ({ setIsShown, orgId, mutate, teams }: any) => {
   const labelDropdown = useRef<HTMLUListElement>(null);
   const [selectedLabel, setSelectedLabel] = useState('');
 
@@ -33,17 +34,37 @@ const CreateTeamForm = ({ setIsShown, orgId }: any) => {
     event.preventDefault();
     const { teamName, teamLogin } = event.target;
     try {
-      const res = await createNewTeam({
-        orgId,
-        payload: {
-          login: teamLogin.value,
-          name: teamName.value,
-        },
-      });
-      // console.log();
-      if (res.success) {
-        closeModal();
-      }
+      // const res = await createNewTeam({
+      //   orgId,
+      //   payload: {
+      //     login: teamLogin.value,
+      //     name: teamName.value,
+      //   },
+      // });
+
+      await mutate(
+        teamEndpoint,
+        createNewTeam({
+          orgId,
+          payload: {
+            login: teamLogin.value,
+            name: teamName.value,
+          },
+        }),
+        {
+          optimisticData: [
+            ...teams,
+            {
+              login: teamLogin.value,
+              name: teamName.value,
+            },
+          ],
+          rollbackOnError: true,
+        } as MutatorOptions
+      );
+      // if (res.success) {
+      closeModal();
+      // }
     } catch (error) {
       console.log(error);
     }

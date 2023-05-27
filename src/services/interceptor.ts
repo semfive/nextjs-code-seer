@@ -14,10 +14,7 @@ interceptor.interceptors.request.use((req: InternalAxiosRequestConfig<any>) => {
 interceptor.interceptors.response.use(
   (res) => res,
   (error: AxiosError) => {
-    // console.log(error);
-    if (error.response?.status === 401) {
-      window.location.href = '/login';
-    }
+    console.log(error);
     return Promise.reject(error.response);
   }
 );
