@@ -35,7 +35,7 @@ const OrganizationDetail = () => {
 
   useEffect(() => {
     dispatch(setDependencyMaps([]));
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
