@@ -152,7 +152,7 @@ const CreateDomainForm = ({
     };
 
     fetchGithubOrgs();
-  }, []);
+  }, [user.githubToken, user.login]);
 
   useEffect(() => {
     const fetchInstalledAppRepos = async () => {
