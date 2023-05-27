@@ -53,7 +53,7 @@ export function getChildrenBiggestSize(node: Node) {
   // Remove the short element
   document.body.removeChild(short);
 
-  const dummyWidth = (longWidth + shortWidth) / 2 + iconSize;
+  const dummyWidth = longWidth + iconSize;
   const dummyHeight = (longHeight + shortHeight) / 2;
   return { dummyWidth, dummyHeight };
 }
@@ -286,7 +286,6 @@ export const generateInitialEdges = (
     }));
 
 export const generateInitSetup = (data: any) => {
-  console.log(data);
   const nodeAr: INodePayload[] = data.modules.map((module: any) => ({
     source: module.source,
     orphan: module.orphan,
@@ -331,11 +330,9 @@ export const getAllPosibleEdge = (
   presentNodes: Node[],
   mainData: IMainData
 ) => {
-  console.log(sourceNode);
   if (!sourceNode.id.includes('.') && sourceNode.data.isExpand) {
   }
 
-  // console.log(sourceNode, presentNodes, mainData);
   const allPosibleEdges: IEdgePayload[] = mainData.edges.filter(
     (edge: IEdgePayload) => edge.from === sourceNode.id
   );
@@ -345,5 +342,3 @@ export const getAllPosibleEdge = (
 
   return interSectionsEdges;
 };
-
-// const getIntersectionsArr = (arr1, arr2) => {};

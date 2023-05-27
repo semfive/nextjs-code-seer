@@ -40,7 +40,8 @@ const CreateTeamForm = ({ setIsShown, orgId }: any) => {
           name: teamName.value,
         },
       });
-      if (res.data.success) {
+      // console.log();
+      if (res.success) {
         closeModal();
       }
     } catch (error) {

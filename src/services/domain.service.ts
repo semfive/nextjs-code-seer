@@ -1,6 +1,11 @@
 import axios, { AxiosResponse } from 'axios';
 import interceptor from './interceptor';
-import { ICreateDomain, IRunWorkflow } from '@/interfaces/domain.interface';
+import {
+  ICreateDomain,
+  IRunWorkflow,
+  IWorkflow,
+  IWorkflows,
+} from '@/interfaces/domain.interface';
 
 export const domainEndpoint = '/domains';
 
@@ -54,4 +59,41 @@ export const retrieveInstalledAppRepos = async (login: string) => {
   const res = await interceptor.get(`repositories?login=${login}`);
 
   return res.data.data;
+};
+
+export const retrieveWorkflows = async ({
+  owner,
+  repository,
+  githubToken,
+}: IWorkflows) => {
+  const res = await axios.get(
+    `https://api.github.com/repos/${owner}/${repository}/actions/runs`,
+    {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${githubToken}`,
+      },
+    }
+  );
+
+  return res.data;
+};
+
+export const retrieveWorkflowById = async ({
+  owner,
+  repository,
+  githubToken,
+  workflowId,
+}: IWorkflow) => {
+  const res = await axios.get(
+    `https://api.github.com/repos/${owner}/${repository}/actions/runs/${workflowId}`,
+    {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${githubToken}`,
+      },
+    }
+  );
+
+  return res.data;
 };

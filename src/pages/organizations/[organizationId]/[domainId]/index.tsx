@@ -32,7 +32,12 @@ import {
   ClipboardText,
 } from '@/components/icons';
 import { useRouter } from 'next/router';
-import { retrieveMaps, runWorkflow } from '@/services/domain.service';
+import {
+  retrieveMaps,
+  retrieveWorkflowById,
+  retrieveWorkflows,
+  runWorkflow,
+} from '@/services/domain.service';
 import {
   getFourCornPos,
   getChildrenBiggestSize,
@@ -44,6 +49,9 @@ import PrivateRoute from '@/components/common/PrivateRoute';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
 import { toast } from 'react-toastify';
 import { setDependencyMaps } from '@/redux/slices/domainSlice';
+import { IDomain, IWorkflow } from '@/interfaces/domain.interface';
+import { IOrganization } from '@/interfaces';
+import useUser from '@/hooks/useUser';
 
 const padding = 10;
 const gap = 10;
@@ -58,19 +66,22 @@ const iconSize = 24;
 
 function Codebase() {
   const router = useRouter();
-  const domain = useAppSelector((state) => state.domain.domain);
-  const organization = useAppSelector(
-    (state) => state.organizationSlice.organization
-  );
-  const dispatch = useAppDispatch();
-
   const { domainId } = router.query;
 
-  if (domain) [console.log(domain)];
+  const dispatch = useAppDispatch();
+  const domain: IDomain | undefined = useAppSelector(
+    (state) => state.domain.domain
+  );
+  const organization: IOrganization | undefined = useAppSelector(
+    (state) => state.organizationSlice.organization
+  );
+
+  const user: any = useUser();
 
   const [mapData, setMapData] = useState<IMainData>({ nodes: [], edges: [] });
   const [explorer, setExplorer] = useState<any[]>([]);
   const [depMaps, setDepMaps] = useState([]);
+  const [workflowRunning, setWorkflowRunning] = useState(false);
 
   const nodeTypes: NodeTypes = useMemo(
     () => ({
@@ -96,155 +107,88 @@ function Codebase() {
   );
 
   const createNewEdges = (selectedNode: Node, newNodes: Node[]) => {
-    nodes.concat(newNodes).forEach((nN) => {
-      const test = getAllPosibleEdge(nN, nodes.concat(newNodes), mapData);
-      // console.log('Test', test);
-    });
-
-    // console.log(selectedNode, newNodes);
-    const fileNodes = newNodes.filter((n) => n.id.includes('.'));
-    const allPresentNods = [...nodes, ...newNodes].filter((n) =>
-      n.id.includes('.')
-    );
+    const allNodes = nodes
+      .concat(newNodes)
+      .filter(
+        (n: Node) => n.id !== selectedNode.id && n.data.isExpand !== true
+      );
 
     const possibleConnections = mapData.edges.filter((ed: any) =>
-      allPresentNods.find((fN) => ed.from.includes(fN.id))
-    );
-    // console.log('fileNodes: ', fileNodes);
-    // console.log('Possible Conenctions: ', possibleConnections);
-    // console.log(edges);
-
-    const currentSourceNodes = nodes.filter((n) => {
-      if (n.id.includes('.')) {
-        const haveEdge = edges.find(
-          (eds) => eds.source === n.id && eds.target === selectedNode.id
-        );
-        if (haveEdge) {
-          return n;
-        }
-      }
-      return undefined;
-    });
-    const currentEdgesToSelectedNode = edges.filter(
-      (eds) => eds.target === selectedNode.id
+      allNodes.find((fN) => ed.from.includes(`/${fN.id}`) || ed.from === fN.id)
     );
 
-    const possibleConnectionsToChildNode = currentSourceNodes
-      .map((curSrcNode) =>
-        mapData.edges.filter((ed: any) =>
-          newNodes.find(
-            (fN) =>
-              ed.from === curSrcNode.id &&
-              (fN.id.includes('.')
-                ? ed.to.includes(fN.id)
-                : ed.to.split('/').includes(fN.id))
-          )
-        )
-      )
-      .flat(1);
-    // console.log('current edge to folder', currentEdgesToSelectedNode);
-    // console.log(
-    //   'Possible connect to childnode',
-    //   possibleConnectionsToChildNode
-    // );
+    const egdesMap = new Map<string, Edge>();
 
-    fileNodes.forEach((fN) => {
+    allNodes.forEach((node: Node) => {
       const exactConnections = possibleConnections.filter(
-        (pC: any) => pC.from === fN.id
+        (pC: any) => pC.from === node.id || pC.from.split('/').includes(node.id)
       );
-      newNodes.forEach((nN: Node) => {
-        const isFolder = !nN.id.includes('.');
 
-        if (isFolder) {
-          exactConnections.forEach((eC: any) => {
-            if (eC.to.split('/').includes(nN.id)) {
-              const newEdge = {
-                id: `${fN.id}~${eC.to}`,
-                source: fN.id,
-                target: nN.id,
-                markerEnd: {
-                  type: MarkerType.ArrowClosed,
-                },
-              };
-              if (!edges.find((eds) => eds.id === newEdge.id)) {
-                setEdges((prev) => [...prev, newEdge]);
-              }
-            }
-          });
-        } else {
-          exactConnections.forEach((eC: any) => {
-            if (eC.to === nN.id) {
-              const newEdge = {
-                id: `${fN.id}~${nN.id}`,
-                source: fN.id,
-                target: nN.id,
-                markerEnd: {
-                  type: MarkerType.ArrowClosed,
-                },
-              };
-              if (!edges.find((eds) => eds.id === newEdge.id)) {
-                setEdges((prev) => [...prev, newEdge]);
-              }
-            }
-          });
-        }
-      });
-    });
-
-    // remove edges
-    if (currentEdgesToSelectedNode && currentEdgesToSelectedNode.length > 0) {
-      currentEdgesToSelectedNode.forEach((curEdToNds) => {
-        const exactConnections = possibleConnectionsToChildNode.filter(
-          (pC) => curEdToNds.id.split('~')[1] === pC.to
-        );
-
-        exactConnections.forEach((eC) => {
-          const isHaving = edges.find((e) => e.id === `${eC.from}~${eC.to}`);
-          console.log(isHaving);
-          if (isHaving) {
-            setEdges((prev) =>
-              prev.map((e) => {
-                if (e.id === isHaving.id) {
-                  return {
-                    ...isHaving,
-                    target: isHaving.id.split('~')[1],
-                  };
-                }
-                return e;
-              })
+      return exactConnections.forEach((exactConnect) => {
+        if (node.id.includes('.')) {
+          if (exactConnect.from === node.id) {
+            const isTargetVisible = allNodes.find(
+              (n) => n.id === exactConnect.to
             );
-          } else {
-            const newEdge = {
-              id: `${curEdToNds.id}~${eC.to}`,
-              source: curEdToNds.id,
-              target: eC.to,
+            const source = node.id;
+            const target = isTargetVisible
+              ? isTargetVisible.id
+              : allNodes.find((n) =>
+                  exactConnect.to.split('/').includes(n.id)
+                )!!.id;
+
+            const edgeData = {
+              id: `${source}~${exactConnect.to}`,
+              source: source,
+              target: target,
               markerEnd: {
                 type: MarkerType.ArrowClosed,
               },
             };
-            console.log(edges);
-            console.log(newEdge);
-            console.log(
-              'Present edge:',
-              edges.find(
-                (e) =>
-                  e.id === curEdToNds.source && e.target === selectedNode.id
-              )
-            );
 
-            reactFlowInstance.addEdges(newEdge);
-
-            // setEdges((prev) => [...prev, newEdge]);
+            egdesMap.set(edgeData.id, edgeData);
           }
-        });
+        } else {
+          if (exactConnect.from.split('/').includes(node.id)) {
+            const isTargetVisible = allNodes.find(
+              (n) => n.id === exactConnect.to
+            );
+            const source = node.id;
+            const target = isTargetVisible
+              ? isTargetVisible.id
+              : allNodes.find((n) =>
+                  exactConnect.to.split('/').includes(n.id)
+                )!!.id;
+            const edgeData: Edge = {
+              id: `${source}~${target}`,
+              source: source,
+              target: target as string,
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+              },
+            };
+            egdesMap.set(edgeData.id, edgeData);
+          }
+        }
       });
-    }
+    });
+
+    let trueEdges: Edge[] = [];
+
+    egdesMap.forEach((value, key, egdesMap) => {
+      trueEdges.push(value);
+    });
+
+    reactFlowInstance.setEdges(trueEdges);
   };
 
   const createNewNodes = (parentNode: Node) => {
     const { dummyWidth } = getChildrenBiggestSize(parentNode);
     const numOfRow = Math.ceil(Math.sqrt(parentNode.data.children.length));
     const numOfCol = Math.ceil(Math.sqrt(parentNode.data.children.length));
+
+    let prevNode: any = undefined;
+
     const newNodes = parentNode.data.children.map((cN: any, index: number) => {
       const nodeData = {
         id: cN.name,
@@ -307,64 +251,57 @@ function Codebase() {
 
     setNodes((prev) =>
       prev.map((nds) => {
-        const exactNode = sameLevelNodes.find(
+        const exactNodes = sameLevelNodes.find(
           (n) => n.id === nds.id && n.id !== selectedNode.id
         );
-        if (exactNode) {
+        if (exactNodes) {
           const isSameParent = selectedNode.parentNode === nds.parentNode;
           if (isSameParent) {
             const trarverseX = nds.position.x + growingWidth;
             const trarverseY = nds.position.y + growingHeight;
 
-            if (
-              nds.position.y > selectedNode.position.y &&
-              nds.position.x >= selectedNode.position.x
-            ) {
+            const sourceLeft = selectedNode.position.x;
+            const targetLeft = nds.position.x;
+            const sourceTop = selectedNode.position.y;
+            const targetTop = nds.position.y;
+
+            if (targetTop > sourceTop && targetLeft >= sourceLeft) {
               return {
                 ...nds,
                 position: {
-                  x: nds.position.x,
+                  x: targetLeft,
                   y: trarverseY,
                 },
               };
             }
-            if (
-              nds.position.y === selectedNode.position.y &&
-              nds.position.x > selectedNode.position.x
-            ) {
+            if (targetTop === sourceTop && targetLeft > sourceLeft) {
               return {
                 ...nds,
                 position: {
                   x: trarverseX,
-                  y: nds.position.y,
+                  y: targetTop,
                 },
               };
             }
 
-            if (
-              nds.position.y < selectedNode.position.y &&
-              nds.position.x >= selectedNode.position.x
-            ) {
+            if (targetTop < sourceTop && targetLeft >= sourceLeft) {
               const nodeCorners = getFourCornPos(nds);
-              if (nodeCorners.bottomLeft.y >= selectedNode.position.y) {
+              if (nodeCorners.bottomLeft.y >= sourceTop) {
                 return {
                   ...nds,
                   position: {
                     x: trarverseX,
-                    y: nds.position.y,
+                    y: targetTop,
                   },
                 };
               }
             }
 
-            if (
-              nds.position.y > selectedNode.position.y &&
-              nds.position.x < selectedNode.position.x
-            ) {
+            if (targetTop > sourceTop && targetLeft < sourceLeft) {
               const nodeCorners = getFourCornPos(passingNode);
               if (
-                nodeCorners.bottomLeft.y >= nds.position.y &&
-                nodeCorners.bottomLeft.x < nds.position.x + nds.width!!
+                nodeCorners.bottomLeft.y >= targetTop &&
+                nodeCorners.bottomLeft.x < targetLeft + nds.width!!
               ) {
                 return {
                   ...nds,
@@ -519,20 +456,76 @@ function Codebase() {
     }
   };
 
+  const handleGetWorkflow = async ({
+    owner,
+    repository,
+    githubToken,
+    workflowId,
+  }: IWorkflow) => {
+    const workflow = await retrieveWorkflowById({
+      owner,
+      repository,
+      githubToken: githubToken,
+      workflowId: workflowId,
+    });
+
+    if (workflow.status !== 'completed') {
+      setTimeout(() => {
+        handleGetWorkflow({
+          owner,
+          repository,
+          githubToken: githubToken,
+          workflowId: workflowId,
+        });
+      }, 30000);
+    }
+
+    return workflow;
+  };
+
+  const handleTrackingWorkflow = async () => {
+    if (!domain) return;
+    try {
+      const owner = domain.domain.repository.split('/')[0];
+      const repository = domain.domain.repository.split('/')[1];
+      const res = await retrieveWorkflows({
+        owner,
+        repository,
+        githubToken: user.githubToken,
+      });
+      setWorkflowRunning(true);
+
+      const { workflows_run } = res;
+      const in_progress_workflows = workflows_run.filter(
+        (workflow_run: any) => workflow_run.status !== 'completed'
+      );
+
+      const workflow = await handleGetWorkflow({
+        owner,
+        repository,
+        githubToken: user.githubToken,
+        workflowId: in_progress_workflows[0].id,
+      });
+
+      if (workflow.status === 'completed') setWorkflowRunning(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleRunWorkflow = async () => {
     try {
       const owner = domain?.domain.repository.split('/')[0] as string;
       const repository = domain?.domain.repository.split('/')[1] as string;
       const res = await runWorkflow({ owner, repository });
       console.log(res);
-      if (res.success) toast.success('Run workflow success');
+      if (res.success) {
+        handleTrackingWorkflow();
+        toast.success('Run workflow success');
+      }
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const onIconClick = () => {
-    console.log('Click Icon');
   };
 
   useEffect(() => {
@@ -541,20 +534,23 @@ function Codebase() {
         const res = await retrieveMaps(domainId as string);
         dispatch(setDependencyMaps(res.data));
         setDepMaps(res.data);
+        if (res.data.length > 0) {
+          const { initialNodes, initialEdges, explorer, mainData } =
+            generateInitSetup(JSON.parse(res.data[0].payload));
 
-        const { initialNodes, initialEdges, explorer, mainData } =
-          generateInitSetup(JSON.parse(res.data[0].payload));
-
-        setNodes(initialNodes);
-        setEdges(initialEdges);
-        setExplorer(explorer);
-        setMapData(mainData);
+          setNodes(initialNodes);
+          setEdges(initialEdges);
+          setExplorer(explorer);
+          setMapData(mainData);
+        }
       } catch (error) {
         console.log(error);
       }
     };
     if (domainId) fetchMaps();
   }, [dispatch, domainId, setEdges, setNodes]);
+
+  if (workflowRunning) return <h1>Tracking workflow progress</h1>;
 
   return (
     <div className='w-full h-screen flex overflow-hidden'>
@@ -563,7 +559,7 @@ function Codebase() {
         <div className='px-7 py-6 flex justify-between bg-[#F7F8FA] border-b-2 border-[#E3E3E3] drop-shadow-md'>
           <div className='flex gap-3 text-lg font-semibold'>
             <span className='text-md_blue'>
-              {organization ? organization.name : 'Organization'}
+              {organization ? organization.organization.name : 'Organization'}
             </span>
             <ChevronRight className='text-md_blue' />
             <span className='text-primary_gray'>

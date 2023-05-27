@@ -89,12 +89,10 @@ const CreateOrgForm = ({ isShown, setIsShown }: any) => {
   const handleCreateOrg = async (event: any) => {
     event.preventDefault();
     const { organizationName, organizationLogin } = event.target;
-    console.log(organizationName.value);
     const validInput = validateFormInput(
       organizationName.value,
       organizationLogin.value
     );
-    console.log(validInput);
     if (validInput) {
       try {
         const res = await createNewOrganization(organizationEndpoint, {
@@ -102,10 +100,7 @@ const CreateOrgForm = ({ isShown, setIsShown }: any) => {
           name: organizationName.value,
           description: value,
         });
-
-        if (res.data.success) {
-          closeModal();
-        }
+        closeModal();
       } catch (error) {
         console.log(error);
       }

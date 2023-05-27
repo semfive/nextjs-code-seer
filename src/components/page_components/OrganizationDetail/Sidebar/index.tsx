@@ -18,6 +18,7 @@ import CreateTeamForm from '../CreateTeamForm';
 import CreateDomainForm from '../CreateDomainForm';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
 import { setDomain } from '@/redux/slices/domainSlice';
+import ButtonFilled from '@/components/common/ButtonFilled';
 
 const Sidebar = () => {
   const router = useRouter();
@@ -36,26 +37,31 @@ const Sidebar = () => {
     data: teams,
     error: teamsErr,
     isLoading: isTeamLoading,
+    mutate: mutateTeam,
   } = useSWR(teamEndpoint, retrieveTeams);
   const {
     data: domains,
     error: domainsErr,
     isLoading: isDomainsLoading,
-    mutate,
+    mutate: mutateDomain,
   } = useSWR(domainEndpoint, retrieveDomains);
 
-  if (isTeamLoading || isDomainsLoading) return <h1>Loading</h1>;
+  // if (isTeamLoading || isDomainsLoading) return <h1>Loading</h1>;
 
   return (
     <>
       {showCreateTeam && (
-        <CreateTeamForm setIsShown={setShowCreateTeam} orgId={organizationId} />
+        <CreateTeamForm
+          setIsShown={setShowCreateTeam}
+          orgId={organizationId}
+          mutate={mutateTeam}
+        />
       )}
       {showCreateDomain && teams && (
         <CreateDomainForm
           setIsShown={setShowCreateDomain}
           teams={teams.data}
-          mutate={mutate}
+          mutate={mutateDomain}
           domains={domains.data}
         />
       )}
@@ -176,6 +182,8 @@ const Sidebar = () => {
                   >
                     {team.name}
                   </button>
+
+                  <ButtonFilled>Join</ButtonFilled>
                 </li>
               ))}
             </ul>

@@ -5,11 +5,6 @@ import { Handle, NodeProps, Position } from 'reactflow';
 function CustomNode(props: NodeProps | any) {
   const { data, isConnectable, handleIconClick } = props;
 
-  const onIconClick = (e: any) => {
-    e.stopPropagation();
-    console.log(e);
-  };
-
   return (
     <div className='w-fit    text-black px-[10px] '>
       {/* <NodeResizer minWidth={160} minHeight={30} /> */}
@@ -24,12 +19,12 @@ function CustomNode(props: NodeProps | any) {
         <div className='label flex items-center justify-center text-black'>
           {data.label.includes('.') ? (
             <span className='flex items-center'>
-              <FileCodeIcon className='w-5 h-auto mr-1' onClick={onIconClick} />
+              <FileCodeIcon className='w-5 h-auto mr-1' />
               {data.label.split('/')[data.label.split('/').length - 1]}
             </span>
           ) : (
             <span className='flex items-center'>
-              <FolderIcon className='w-5 h-auto mr-1' onClick={onIconClick} />{' '}
+              <FolderIcon className='w-5 h-auto mr-1' />
               {data.label}
             </span>
           )}

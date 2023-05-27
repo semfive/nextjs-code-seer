@@ -28,3 +28,13 @@ export interface IRunWorkflow {
   owner: string;
   repository: string;
 }
+
+export interface IWorkflows {
+  owner: string;
+  repository: string;
+  githubToken: String;
+}
+
+export interface IWorkflow extends IWorkflows {
+  workflowId: string;
+}

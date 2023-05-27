@@ -8,7 +8,6 @@ const PrivateRoute = ({ children }: any) => {
   const router = useRouter();
 
   const user = useUser();
-  console.log(user);
   useEffect(() => {
     if (user === null) router.push('/login');
   }, [router, user]);

@@ -34,9 +34,7 @@ const OrganizationList = () => {
 
   const user = useUser();
 
-  console.log(user);
-
-  if (isLoading) return <h1 className='text-2xl font-bold'>Loading...</h1>;
+  // if (isLoading) return <h1 className='text-2xl font-bold'>Loading...</h1>;
 
   return (
     <main className='h-full px-10'>

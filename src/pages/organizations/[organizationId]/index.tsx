@@ -2,7 +2,7 @@
 
 import { CommitChanges, Layout, Sidebar } from '@/components';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import MapVersion from '/public/map-version.png';
 import Image from 'next/image';
 import useSWR from 'swr';
@@ -13,6 +13,7 @@ import {
 import PrivateRoute from '@/components/common/PrivateRoute';
 import { useAppDispatch } from '@/redux/reduxHooks';
 import { setOrganization } from '@/redux/slices/organizationSlice';
+import { setDependencyMaps } from '@/redux/slices/domainSlice';
 
 const OrganizationDetail = () => {
   const router = useRouter();
@@ -25,11 +26,16 @@ const OrganizationDetail = () => {
     organizationId ? `${organizationEndpoint}/${organizationId}` : null,
     retrieveAnOrganization
   );
+
   const dispatch = useAppDispatch();
 
   if (organization) dispatch(setOrganization(organization));
 
-  if (isOrgLoading) return <h1>Loading</h1>;
+  // if (isOrgLoading) return <h1>Loading</h1>;
+
+  useEffect(() => {
+    dispatch(setDependencyMaps([]));
+  }, []);
 
   return (
     <>
