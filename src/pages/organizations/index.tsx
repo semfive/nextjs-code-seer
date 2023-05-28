@@ -16,6 +16,7 @@ import {
 } from '@/services/organization.service';
 import useUser from '@/hooks/useUser';
 import PrivateRoute from '@/components/common/PrivateRoute';
+import Script from 'next/script';
 
 const organizationTypes = [
   'Onboarding',
@@ -84,6 +85,20 @@ const OrganizationList = () => {
         <div className='h-[1px] w-full bg-slate-700' />
         <div className='min-h-[300px]'></div>
       </section>
+
+      <Script
+        src='https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID'
+        strategy='afterInteractive'
+      />
+      <Script id='google-analytics' strategy='afterInteractive'>
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'GA_MEASUREMENT_ID');
+        `}
+      </Script>
     </main>
   );
 };

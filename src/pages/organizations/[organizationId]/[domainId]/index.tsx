@@ -57,6 +57,7 @@ import { IDomain, IWorkflow } from '@/interfaces/domain.interface';
 import { IOrganization } from '@/interfaces';
 import useUser from '@/hooks/useUser';
 import Link from 'next/link';
+import Script from 'next/script';
 
 const padding = 10;
 const gap = 10;
@@ -678,6 +679,19 @@ function Codebase() {
           </div>
         )}
       </div>
+      <Script
+        src='https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID'
+        strategy='afterInteractive'
+      />
+      <Script id='google-analytics' strategy='afterInteractive'>
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'GA_MEASUREMENT_ID');
+        `}
+      </Script>
     </div>
   );
 }

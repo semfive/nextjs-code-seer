@@ -14,6 +14,7 @@ import PrivateRoute from '@/components/common/PrivateRoute';
 import { useAppDispatch } from '@/redux/reduxHooks';
 import { setOrganization } from '@/redux/slices/organizationSlice';
 import { setDependencyMaps } from '@/redux/slices/domainSlice';
+import Script from 'next/script';
 
 const OrganizationDetail = () => {
   const router = useRouter();
@@ -74,6 +75,19 @@ const OrganizationDetail = () => {
             ))}
           </ul>
         </section>
+        <Script
+          src='https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID'
+          strategy='afterInteractive'
+        />
+        <Script id='google-analytics' strategy='afterInteractive'>
+          {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'GA_MEASUREMENT_ID');
+        `}
+        </Script>
       </div>
       <aside className=' lg:w-96'></aside>
     </>
