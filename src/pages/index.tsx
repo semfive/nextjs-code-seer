@@ -5,9 +5,8 @@ import background from '/public/welcome-background.png';
 import CodeSeerLogo from '/public/codeseer-logo.png';
 import WelcomeBanner from '/public/welcome-banner.png';
 import Link from 'next/link';
-import { ButtonOutline } from '@/components';
+import { ButtonOutline, GoogleScript } from '@/components';
 import { useRef, useState } from 'react';
-import Script from 'next/script';
 
 export default function Home() {
   const menuListRef = useRef<HTMLUListElement>(null);
@@ -101,19 +100,7 @@ export default function Home() {
         </div>
       </div>
 
-      <Script
-        src='https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID'
-        strategy='afterInteractive'
-      />
-      <Script id='google-analytics' strategy='afterInteractive'>
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-        
-          gtag('config', 'G-FMJBKLD5KF');
-        `}
-      </Script>
+      <GoogleScript />
     </main>
   );
 }

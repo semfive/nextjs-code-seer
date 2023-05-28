@@ -1,6 +1,6 @@
 'use client';
 
-import { CommitChanges, Layout, Sidebar } from '@/components';
+import { CommitChanges, GoogleScript, Layout, Sidebar } from '@/components';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import MapVersion from '/public/map-version.png';
@@ -75,19 +75,7 @@ const OrganizationDetail = () => {
             ))}
           </ul>
         </section>
-        <Script
-          src='https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID'
-          strategy='afterInteractive'
-        />
-        <Script id='google-analytics' strategy='afterInteractive'>
-          {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-        
-          gtag('config', 'G-FMJBKLD5KF');
-        `}
-        </Script>
+        <GoogleScript />
       </div>
       <aside className=' lg:w-96'></aside>
     </>

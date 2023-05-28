@@ -18,6 +18,7 @@ import CreateTeamForm from './page_components/OrganizationDetail/CreateTeamForm'
 import LoadingWorkFlow from './page_components/DomainDetail/LoadingWorkFlow';
 import withPrivateRoute from './Layout/withPrivateRoute';
 import Loader from './common/Loader';
+import GoogleScript from './common/GoogleScript';
 
 export {
   ButtonOutline,
@@ -40,4 +41,5 @@ export {
   LoadingWorkFlow,
   Sidebar,
   Loader,
+  GoogleScript,
 };
