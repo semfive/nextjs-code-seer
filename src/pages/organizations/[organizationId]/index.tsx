@@ -1,6 +1,6 @@
 'use client';
 
-import { CommitChanges, GoogleScript, Layout, Sidebar } from '@/components';
+import { CommitChanges, Layout, Sidebar } from '@/components';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import MapVersion from '/public/map-version.png';
@@ -14,7 +14,6 @@ import PrivateRoute from '@/components/common/PrivateRoute';
 import { useAppDispatch } from '@/redux/reduxHooks';
 import { setOrganization } from '@/redux/slices/organizationSlice';
 import { setDependencyMaps } from '@/redux/slices/domainSlice';
-import Script from 'next/script';
 
 const OrganizationDetail = () => {
   const router = useRouter();

@@ -10,10 +10,9 @@ import {
   retrieveInstalledAppRepos,
 } from '@/services/domain.service';
 import dynamic from 'next/dynamic';
-import React, { MouseEventHandler, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { MutatorOptions } from 'swr';
-import jwt_decode from 'jwt-decode';
 import useUser from '@/hooks/useUser';
 
 interface ICreateDomainForm {

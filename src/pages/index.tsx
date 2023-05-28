@@ -5,8 +5,8 @@ import background from '/public/welcome-background.png';
 import CodeSeerLogo from '/public/codeseer-logo.png';
 import WelcomeBanner from '/public/welcome-banner.png';
 import Link from 'next/link';
-import { ButtonOutline, GoogleScript } from '@/components';
-import { useRef, useState } from 'react';
+import { ButtonOutline } from '@/components';
+import { useRef } from 'react';
 
 export default function Home() {
   const menuListRef = useRef<HTMLUListElement>(null);

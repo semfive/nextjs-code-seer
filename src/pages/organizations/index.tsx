@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  CreateOrgForm,
-  GoogleScript,
-  Layout,
-  OrganizationCard,
-  withPrivateRoute,
-} from '@/components';
+import { CreateOrgForm, Layout, OrganizationCard } from '@/components';
 import React, { useState } from 'react';
 import styles from './organizations.module.scss';
 import useSWR from 'swr';
