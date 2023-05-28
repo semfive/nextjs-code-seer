@@ -31,16 +31,16 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       </ReactFlowProvider>
       <Script
         async={true}
-        src='https://www.googletagmanager.com/gtag/js?id=G-FMJBKLD5KF'
+        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
         strategy='afterInteractive'
       />
       <Script id='google-analytics' strategy='afterInteractive'>
         {`
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
     
-      gtag('config', 'G-FMJBKLD5KF');
+      gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');
     `}
       </Script>
     </>
