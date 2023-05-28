@@ -680,7 +680,6 @@ function Codebase() {
           </div>
         )}
       </div>
-      <GoogleScript />
     </div>
   );
 }

@@ -75,7 +75,6 @@ const OrganizationDetail = () => {
             ))}
           </ul>
         </section>
-        <GoogleScript />
       </div>
       <aside className=' lg:w-96'></aside>
     </>

@@ -84,8 +84,6 @@ const OrganizationList = () => {
         <div className='h-[1px] w-full bg-slate-700' />
         <div className='min-h-[300px]'></div>
       </section>
-
-      <GoogleScript />
     </main>
   );
 };
