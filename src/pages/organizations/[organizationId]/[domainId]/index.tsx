@@ -26,8 +26,6 @@ import {
   FloatingConnectionLine,
   FloatingEdge,
   ButtonOutline,
-  Loader,
-  GoogleScript,
 } from '@/components';
 import './dependency-map.module.scss';
 import {

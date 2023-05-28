@@ -56,7 +56,6 @@ const Login = () => {
           </p>
         </div>
       </main>
-      <GoogleScript />
     </div>
   );
 };
