@@ -10,6 +10,7 @@ import 'react-quill/dist/quill.snow.css';
 import Providers from '@/components/common/Providers';
 import Script from 'next/script';
 import Head from 'next/head';
+import { Analytics } from '@vercel/analytics/react';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -51,6 +52,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');
     `}
       </Script>
+      <Analytics />
     </>
   );
 }
