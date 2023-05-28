@@ -5,6 +5,7 @@ const GoogleScript = () => {
   return (
     <>
       <Script
+        async
         src='https://www.googletagmanager.com/gtag/js?id=G-FMJBKLD5KF'
         strategy='afterInteractive'
       />
